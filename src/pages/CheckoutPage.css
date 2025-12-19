@@ -1,0 +1,350 @@
+.checkout-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+}
+
+/* チェックアウトフォーム */
+.checkout-forms {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.checkout-section {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+/* 支払い方法 */
+.payment-options {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.payment-option:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.payment-option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.payment-option input[type="radio"]:checked ~ .check-icon,
+.shipping-option input[type="radio"]:checked ~ .check-icon {
+  display: block;
+}
+
+.option-icon {
+  font-size: 1.5rem;
+}
+
+.option-label {
+  flex: 1;
+  font-weight: 500;
+  color: #374151;
+}
+
+.check-icon {
+  display: none;
+  color: #2563eb;
+}
+
+/* 配送方法 */
+.shipping-options {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.shipping-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.shipping-option:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.shipping-option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.shipping-info {
+  flex: 1;
+}
+
+.shipping-label {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.shipping-desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.shipping-fee {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* クーポン */
+.coupon-input-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.coupon-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.coupon-apply-btn {
+  padding: 0.75rem 1.5rem;
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.coupon-apply-btn:hover {
+  background: #4b5563;
+}
+
+.coupon-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.coupon-message.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.coupon-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.coupon-examples {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.coupon-examples p {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.coupon-examples ul {
+  list-style: none;
+  padding: 0;
+}
+
+.coupon-examples li {
+  padding: 0.25rem 0;
+}
+
+.coupon-examples code {
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  color: #2563eb;
+}
+
+/* 注文確認 */
+.order-confirmation-container {
+  position: relative;
+}
+
+.order-confirmation {
+  position: sticky;
+  top: 6rem;
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.confirmation-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.item-name {
+  color: #374151;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.confirmation-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 1rem 0;
+}
+
+.confirmation-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  color: #374151;
+}
+
+.summary-row.discount {
+  color: #059669;
+}
+
+.summary-row.total {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 0.5rem;
+}
+
+.total-price {
+  font-size: 1.5rem;
+  color: #2563eb;
+}
+
+.confirm-order-btn {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.confirm-order-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.confirm-order-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.order-notice {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+/* レスポンシブ */
+@media (max-width: 1024px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-confirmation {
+    position: static;
+  }
+}
