@@ -3,13 +3,8 @@ import { ShoppingCart, Package, Minus, Plus, Trash2 } from 'lucide-react';
 import './CartPage.css';
 
 function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
-  const subtotal = cart.reduce((sum, item) => 
-    sum + (item.product.price * item.quantity), 0
-  );
-  const shippingFee = subtotal >= 5000 ? 0 : 500;
-  const total = subtotal + shippingFee;
-
-  if (cart.length === 0) {
+  // カートが空の場合は早期リターン
+  if (!cart || cart.length === 0) {
     return (
       <div className="cart-page">
         <div className="empty-cart">
@@ -20,6 +15,13 @@ function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
       </div>
     );
   }
+
+  // カート計算
+  const subtotal = cart.reduce((sum, item) => 
+    sum + (item.product.price * item.quantity), 0
+  );
+  const shippingFee = subtotal >= 5000 ? 0 : 500;
+  const total = subtotal + shippingFee;
 
   return (
     <div className="cart-page">

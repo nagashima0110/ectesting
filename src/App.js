@@ -61,6 +61,14 @@ function App() {
 
   // 楽観的UI更新: カート追加
   const handleAddToCart = async (productId, quantity = 1) => {
+    // 未ログイン時の処理
+    if (!currentUser) {
+      if (window.confirm('カートに追加するにはログインが必要です。ログインページに移動しますか?')) {
+        setCurrentPage('login');
+      }
+      return;
+    }
+
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
