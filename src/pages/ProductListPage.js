@@ -2,7 +2,7 @@ import React from 'react';
 import { Package, Search } from 'lucide-react';
 import './ProductListPage.css';
 
-function ProductListPage({ products, loading, filters, setFilters, onAddToCart }) {
+function ProductListPage({ products, loading, filters, setFilters, onAddToCart, isLoggedIn }) {
   const filteredProducts = products.filter(p => 
     !filters.search || p.name.toLowerCase().includes(filters.search.toLowerCase())
   );
