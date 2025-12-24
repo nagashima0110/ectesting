@@ -287,7 +287,7 @@ function App() {
       {/* フッター */}
       <footer className="footer">
         <div className="container footer-content">
-          <p>🍁M.A.P.L.E. </h1><i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
+          <h1>🍁M.A.P.L.E. </h1><p><i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
           <p className="footer-note">
             このシステムは研修目的で作成されています
           </p>
