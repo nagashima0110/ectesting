@@ -177,7 +177,7 @@ function App() {
       {/* ヘッダー */}
       <header className="header">
         <div className="container header-content">
-          <h1 className="header-title">>🍁M.A.P.L.E. </h1><i>Marketplace for Authentic Products & Lifestyle Experience</i>
+          <h1 className="header-title">🍁M.A.P.L.E. </h1><i>Marketplace for Authentic Products & Lifestyle Experience</i>
           <nav className="header-nav">
             <button
               onClick={() => setCurrentPage('products')}
@@ -286,7 +286,7 @@ function App() {
       {/* フッター */}
       <footer className="footer">
         <div className="container footer-content">
-          <p>>🍁M.A.P.L.E. </h1><i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
+          <p>🍁M.A.P.L.E. </h1><i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
           <p className="footer-note">
             このシステムは研修目的で作成されています
           </p>
