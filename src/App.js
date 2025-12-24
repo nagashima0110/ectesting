@@ -178,7 +178,6 @@ function App() {
       <header className="header">
         <div className="container header-content">
           <h1 className="header-title">🍁M.A.P.L.E. </h1>
-          <p><i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
           <nav className="header-nav">
             <button
               onClick={() => setCurrentPage('products')}
