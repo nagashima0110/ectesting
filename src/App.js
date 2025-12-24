@@ -156,7 +156,7 @@ function App() {
       <div className="app">
         <header className="header">
           <div className="container header-content">
-            <h1 className="header-title">🍁M.A.P.L.E. </h1><i>Marketplace for Authentic Products & Lifestyle Experience</i>
+            <h1 className="header-title">🍁M.A.P.L.E. </h1>
           </div>
         </header>
         <main className="main-content container">
