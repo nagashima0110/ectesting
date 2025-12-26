@@ -133,6 +133,115 @@
   color: #374151;
 }
 
+/* ポイント利用 */
+.points-info {
+  margin-bottom: 1rem;
+}
+
+.points-balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.points-balance span:first-child {
+  color: #92400e;
+  font-weight: 600;
+}
+
+.points-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.points-limit {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.points-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.points-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  text-align: right;
+}
+
+.points-input:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+.points-unit {
+  font-weight: 600;
+  color: #92400e;
+}
+
+.use-all-points-btn {
+  padding: 0.75rem 1rem;
+  background: #fbbf24;
+  color: #78350f;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.use-all-points-btn:hover:not(:disabled) {
+  background: #f59e0b;
+}
+
+.use-all-points-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.points-discount {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #d1fae5;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.points-discount span:first-child {
+  color: #065f46;
+  font-weight: 600;
+}
+
+.discount-value {
+  color: #059669;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.points-warning {
+  padding: 0.75rem;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
 /* クーポン */
 .coupon-input-group {
   display: flex;

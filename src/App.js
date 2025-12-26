@@ -156,7 +156,7 @@ function App() {
       <div className="app">
         <header className="header">
           <div className="container header-content">
-            <h1 className="header-title">🍁M.A.P.L.E. </h1>
+            <h1 className="header-title">ECサイト研修システム</h1>
           </div>
         </header>
         <main className="main-content container">
@@ -177,7 +177,7 @@ function App() {
       {/* ヘッダー */}
       <header className="header">
         <div className="container header-content">
-          <h1 className="header-title">🍁M.A.P.L.E. </h1>
+          <h1 className="header-title">ECサイト研修システム</h1>
           <nav className="header-nav">
             <button
               onClick={() => setCurrentPage('products')}
@@ -260,12 +260,13 @@ function App() {
             cart={cart}
             memberId={MEMBER_ID}
             currentUser={currentUser}
-            onSuccess={() => {
+            onSuccess={(usedPoints) => {
               loadCart();
               setCurrentPage('orders');
-              // ポイント更新
+              // ポイント更新: 使用分を減算、購入分(100pt)を加算
               if (currentUser) {
-                const updatedUser = { ...currentUser, points: (currentUser.points || 0) + 100 };
+                const newPoints = (currentUser.points || 0) - (usedPoints || 0) + 100;
+                const updatedUser = { ...currentUser, points: newPoints };
                 setCurrentUser(updatedUser);
                 localStorage.setItem('currentUser', JSON.stringify(updatedUser));
               }
@@ -286,7 +287,7 @@ function App() {
       {/* フッター */}
       <footer className="footer">
         <div className="container footer-content">
-          <h1>🍁M.A.P.L.E. </h1><p><i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
+          <p>ECサイト研修システム - テスト技法学習用</p>
           <p className="footer-note">
             このシステムは研修目的で作成されています
           </p>

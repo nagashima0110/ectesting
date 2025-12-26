@@ -3,24 +3,35 @@ import { CreditCard, Truck, Tag, CheckCircle } from 'lucide-react';
 import { api } from '../services/api';
 import './CheckoutPage.css';
 
-function CheckoutPage({ cart, memberId, onSuccess }) {
+function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
   const [paymentMethod, setPaymentMethod] = useState('credit');
   const [shippingMethod, setShippingMethod] = useState('standard');
   const [couponCode, setCouponCode] = useState('');
   const [couponValid, setCouponValid] = useState(null);
+  const [usePoints, setUsePoints] = useState(0);
   const [processing, setProcessing] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => 
     sum + (item.product.price * item.quantity), 0
   );
   
-  let discount = 0;
+  // ポイント利用の上限(購入金額の50%まで)
+  const maxPoints = Math.min(
+    currentUser?.points || 0,
+    Math.floor(subtotal * 0.5)
+  );
+  
+  // 実際に使用するポイント
+  const actualUsePoints = Math.min(usePoints, maxPoints);
+  
+  let discount = actualUsePoints; // ポイント割引
+  
   if (couponValid?.valid) {
     const coupon = couponValid.coupon;
     if (coupon.discount_type === 'percentage') {
-      discount = subtotal * (coupon.discount_value / 100);
+      discount += subtotal * (coupon.discount_value / 100);
     } else {
-      discount = coupon.discount_value;
+      discount += coupon.discount_value;
     }
   }
   
@@ -57,6 +68,7 @@ function CheckoutPage({ cart, memberId, onSuccess }) {
       payment_method: paymentMethod,
       shipping_method: shippingMethod,
       coupon_code: couponValid?.valid ? couponCode : null,
+      use_points: actualUsePoints,
       shipping_address: '東京都渋谷区〇〇1-2-3' // 簡略化のため固定
     };
 
@@ -66,7 +78,7 @@ function CheckoutPage({ cart, memberId, onSuccess }) {
 
     if (result.success) {
       alert('注文が完了しました!');
-      onSuccess();
+      onSuccess(actualUsePoints); // 使用ポイントを渡す
     } else {
       alert('エラー: ' + result.error);
     }
@@ -146,6 +158,57 @@ function CheckoutPage({ cart, memberId, onSuccess }) {
             </div>
           </div>
 
+          {/* ポイント利用 */}
+          <div className="checkout-section">
+            <h3 className="section-title">
+              <Tag size={24} />
+              ポイント利用
+            </h3>
+            
+            <div className="points-info">
+              <div className="points-balance">
+                <span>保有ポイント</span>
+                <span className="points-value">{currentUser?.points || 0}pt</span>
+              </div>
+              <div className="points-limit">
+                ※ 購入金額の50%まで利用可能
+              </div>
+            </div>
+
+            <div className="points-input-group">
+              <input
+                type="number"
+                value={usePoints}
+                onChange={(e) => setUsePoints(Math.max(0, Number(e.target.value)))}
+                placeholder="利用ポイント"
+                className="points-input"
+                min="0"
+                max={maxPoints}
+              />
+              <span className="points-unit">pt</span>
+              <button
+                onClick={() => setUsePoints(maxPoints)}
+                className="use-all-points-btn"
+                disabled={maxPoints === 0}
+              >
+                全て使う
+              </button>
+            </div>
+
+            {actualUsePoints > 0 && (
+              <div className="points-discount">
+                <span>ポイント割引</span>
+                <span className="discount-value">-¥{actualUsePoints.toLocaleString()}</span>
+              </div>
+            )}
+
+            {usePoints > maxPoints && (
+              <div className="points-warning">
+                利用可能ポイントは{maxPoints}ptまでです
+              </div>
+            )}
+          </div>
+
           {/* クーポン */}
           <div className="checkout-section">
             <h3 className="section-title">
@@ -218,10 +281,17 @@ function CheckoutPage({ cart, memberId, onSuccess }) {
                 <span>¥{subtotal.toLocaleString()}</span>
               </div>
               
-              {discount > 0 && (
+              {actualUsePoints > 0 && (
                 <div className="summary-row discount">
-                  <span>割引</span>
-                  <span>-¥{discount.toLocaleString()}</span>
+                  <span>ポイント割引</span>
+                  <span>-¥{actualUsePoints.toLocaleString()}</span>
+                </div>
+              )}
+              
+              {discount > actualUsePoints && (
+                <div className="summary-row discount">
+                  <span>クーポン割引</span>
+                  <span>-¥{(discount - actualUsePoints).toLocaleString()}</span>
                 </div>
               )}
               
