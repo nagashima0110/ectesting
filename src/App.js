@@ -156,7 +156,7 @@ function App() {
       <div className="app">
         <header className="header">
           <div className="container header-content">
-            <h1 className="header-title">🍁M.A.P.L.E.</h1>
+            <h1 className="header-title">ECサイト研修システム</h1>
           </div>
         </header>
         <main className="main-content container">
@@ -177,7 +177,7 @@ function App() {
       {/* ヘッダー */}
       <header className="header">
         <div className="container header-content">
-          <h1 className="header-title">🍁M.A.P.L.E.</h1>
+          <h1 className="header-title">ECサイト研修システム</h1>
           <nav className="header-nav">
             <button
               onClick={() => setCurrentPage('products')}
@@ -262,14 +262,47 @@ function App() {
             currentUser={currentUser}
             onSuccess={(usedPoints) => {
               loadCart();
-              setCurrentPage('orders');
-              // ポイント更新: 使用分を減算、購入分(100pt)を加算
+              
+              // ポイント更新と会員情報の再読み込み
               if (currentUser) {
+                // ランクアップの可能性があるため、最新の会員情報を取得
+                // 簡易実装: ローカルで計算
+                const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+                const currentTotalPurchase = currentUser.total_purchase || 0;
+                const newTotalPurchase = currentTotalPurchase + orderTotal;
+                
+                let newRank = 'general';
+                if (newTotalPurchase >= 100000) {
+                  newRank = 'platinum';
+                } else if (newTotalPurchase >= 50000) {
+                  newRank = 'gold';
+                }
+                
                 const newPoints = (currentUser.points || 0) - (usedPoints || 0) + 100;
-                const updatedUser = { ...currentUser, points: newPoints };
+                const updatedUser = { 
+                  ...currentUser, 
+                  points: newPoints,
+                  rank: newRank,
+                  total_purchase: newTotalPurchase
+                };
+                
                 setCurrentUser(updatedUser);
                 localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                
+                // ランクアップした場合は通知
+                if (newRank !== currentUser.rank) {
+                  const rankNames = {
+                    'general': '一般会員',
+                    'gold': 'ゴールド会員',
+                    'platinum': 'プラチナ会員'
+                  };
+                  setTimeout(() => {
+                    alert(`🎉 おめでとうございます!\n${rankNames[newRank]}にランクアップしました!`);
+                  }, 500);
+                }
               }
+              
+              setCurrentPage('orders');
             }}
           />
         )}
@@ -287,7 +320,7 @@ function App() {
       {/* フッター */}
       <footer className="footer">
         <div className="container footer-content">
-          <p>🍁M.A.P.L.E. <i>Marketplace for Authentic Products & Lifestyle Experience</i></p>
+          <p>ECサイト研修システム - テスト技法学習用</p>
           <p className="footer-note">
             このシステムは研修目的で作成されています
           </p>

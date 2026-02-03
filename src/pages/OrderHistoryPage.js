@@ -31,6 +31,28 @@ function OrderHistoryPage({ memberId }) {
     setExpandedOrders(newExpanded);
   };
 
+  const handleCancelOrder = async (order) => {
+    const cancellableStatuses = ['pending', 'paid', 'preparing'];
+    
+    if (!cancellableStatuses.includes(order.status)) {
+      alert('発送済みの注文はキャンセルできません。返品をご希望の場合はお問い合わせください。');
+      return;
+    }
+    
+    if (!window.confirm('この注文をキャンセルしますか?\n在庫とポイントが返却されます。')) {
+      return;
+    }
+    
+    const result = await api.cancelOrder(order.id, memberId);
+    
+    if (result.success) {
+      alert(result.message || '注文をキャンセルしました');
+      loadOrders();
+    } else {
+      alert('エラー: ' + result.error);
+    }
+  };
+
   const statusLabels = {
     pending: { label: '注文受付', color: 'blue' },
     paid: { label: '支払済み', color: 'green' },
@@ -176,6 +198,17 @@ function OrderHistoryPage({ memberId }) {
                       </span>
                     </div>
                   </div>
+                  
+                  {['pending', 'paid', 'preparing'].includes(order.status) && (
+                    <div className="order-actions">
+                      <button
+                        onClick={() => handleCancelOrder(order)}
+                        className="cancel-order-btn"
+                      >
+                        注文をキャンセル
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

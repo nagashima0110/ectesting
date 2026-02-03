@@ -5,6 +5,7 @@
 // TODO: 実際のGAS URLに置き換えてください
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyeyUUKWj6XsErlO80CTzXypT9fy6Q8hhCqWel5lMb9mbWlzLCLWhmecxYItoCpfJqwiA/exec';
 
+
 // 開発用: GAS URLが未設定の場合はモックデータを返す
 const USE_MOCK = GAS_API_URL === 'YOUR_GAS_DEPLOYMENT_URL_HERE';
 
@@ -299,6 +300,51 @@ export const api = {
       const response = await fetch(
         `${GAS_API_URL}?path=orders&method=GET&member_id=${memberId}`
       );
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  // 注文キャンセル
+  async cancelOrder(orderId, memberId) {
+    if (USE_MOCK) {
+      await delay(300);
+      const order = mockOrders.find(o => o.id === orderId && o.member_id === memberId);
+      
+      if (!order) {
+        return { success: false, error: '注文が見つかりません' };
+      }
+      
+      const cancellableStatuses = ['pending', 'paid', 'preparing'];
+      if (!cancellableStatuses.includes(order.status)) {
+        return { 
+          success: false, 
+          error: '発送済みの注文はキャンセルできません。返品をご希望の場合はお問い合わせください。' 
+        };
+      }
+      
+      order.status = 'cancelled';
+      
+      // 在庫を戻す
+      order.items.forEach(item => {
+        const product = mockProducts.find(p => p.id === item.product_id);
+        if (product) {
+          product.stock += item.quantity;
+          if (product.stock > 0) {
+            product.status = 'available';
+          }
+        }
+      });
+      
+      return { success: true, message: '注文をキャンセルしました' };
+    }
+
+    try {
+      const response = await fetch(`${GAS_API_URL}?path=cancel-order&method=POST`, {
+        method: 'POST',
+        body: JSON.stringify({ order_id: orderId, member_id: memberId })
+      });
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };

@@ -283,6 +283,29 @@
   margin-left: 0.5rem;
 }
 
+/* 注文アクション */
+.order-actions {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.cancel-order-btn {
+  padding: 0.75rem 2rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-order-btn:hover {
+  background: #dc2626;
+}
+
 /* レスポンシブ */
 @media (max-width: 768px) {
   .order-header {
