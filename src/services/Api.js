@@ -3,8 +3,7 @@
 // ========================================
 
 // TODO: 実際のGAS URLに置き換えてください
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyeyUUKWj6XsErlO80CTzXypT9fy6Q8hhCqWel5lMb9mbWlzLCLWhmecxYItoCpfJqwiA/exec';
-
+const GAS_API_URL = 'YOUR_GAS_DEPLOYMENT_URL_HERE';
 
 // 開発用: GAS URLが未設定の場合はモックデータを返す
 const USE_MOCK = GAS_API_URL === 'YOUR_GAS_DEPLOYMENT_URL_HERE';
