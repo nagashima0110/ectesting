@@ -156,7 +156,7 @@ function App() {
       <div className="app">
         <header className="header">
           <div className="container header-content">
-            <h1 className="header-title">ECサイト研修システム</h1>
+            <h1 className="header-title">L.E.M.O.N. -Lifestyle Ecommerce & Marketplace for Omnichannel Networks-</h1>
           </div>
         </header>
         <main className="main-content container">
