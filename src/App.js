@@ -177,7 +177,7 @@ function App() {
       {/* ヘッダー */}
       <header className="header">
         <div className="container header-content">
-          <h1 className="header-title">ECサイト研修システム</h1>
+          <h1 className="header-title">🍋L.E.M.O.N.</h1>-Lifestyle Ecommerce & Marketplace for Omnichannel Networks-
           <nav className="header-nav">
             <button
               onClick={() => setCurrentPage('products')}
