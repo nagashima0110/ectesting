@@ -11,7 +11,7 @@ function ProductImage({ name }) {
 
   return (
     <img
-      src={`/images/${name}.jpg`}
+      src={`${process.env.PUBLIC_URL}/images/${name}.jpg`}
       alt={name}
       className="product-img"
       onError={() => setError(true)}
