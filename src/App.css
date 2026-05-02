@@ -21,9 +21,23 @@
   padding: 1rem 1.5rem;
 }
 
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
 .header-title {
   font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1;
+}
+
+.header-subtitle {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .header-nav {

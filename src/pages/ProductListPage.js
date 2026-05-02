@@ -1,6 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Package, Search } from 'lucide-react';
 import './ProductListPage.css';
+
+function ProductImage({ name }) {
+  const [error, setError] = useState(false);
+
+  if (error) {
+    return <Package size={48} className="product-icon" />;
+  }
+
+  return (
+    <img
+      src={`/images/${name}.jpg`}
+      alt={name}
+      className="product-img"
+      onError={() => setError(true)}
+    />
+  );
+}
 
 function ProductListPage({ products, loading, filters, setFilters, onAddToCart, isLoggedIn }) {
   const filteredProducts = products.filter(p => 
@@ -64,7 +81,7 @@ function ProductListPage({ products, loading, filters, setFilters, onAddToCart, 
           {filteredProducts.map(product => (
             <div key={product.id} className="product-card fade-in">
               <div className="product-image">
-                <Package size={48} className="product-icon" />
+                <ProductImage name={product.name} />
               </div>
               
               <div className="product-info">
