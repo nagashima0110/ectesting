@@ -377,10 +377,16 @@ export const api = {
     }
 
     try {
-      const response = await fetch(`${GAS_API_URL}?path=members&method=POST`, {
-        method: 'POST',
-        body: JSON.stringify(userData)
+      const queryParams = new URLSearchParams({
+        path: 'members',
+        method: 'GET',
+        action: 'register',
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        birth_date: userData.birth_date || ''
       });
+      const response = await fetch(`${GAS_API_URL}?${queryParams}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };
