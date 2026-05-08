@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
+import { api } from '../services/api';
 import './RegisterPage.css';
 
 function RegisterPage({ onRegister, onLogin }) {
@@ -11,6 +12,7 @@ function RegisterPage({ onRegister, onLogin }) {
     birthDate: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -19,11 +21,10 @@ function RegisterPage({ onRegister, onLogin }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // バリデーション
     if (formData.password !== formData.confirmPassword) {
       setError('パスワードが一致しません');
       return;
@@ -34,18 +35,20 @@ function RegisterPage({ onRegister, onLogin }) {
       return;
     }
 
-    // 新規ユーザー作成(デモ用)
-    const newUser = {
-      id: Date.now(),
+    setLoading(true);
+    const result = await api.register({
       name: formData.name,
       email: formData.email,
-      birth_date: formData.birthDate,
-      rank: 'general',
-      points: 0,
-      status: 'active'
-    };
+      password: formData.password,
+      birth_date: formData.birthDate
+    });
+    setLoading(false);
 
-    onRegister(newUser);
+    if (result.success) {
+      onRegister(result.data);
+    } else {
+      setError(result.error || '登録に失敗しました');
+    }
   };
 
   return (
@@ -131,8 +134,8 @@ function RegisterPage({ onRegister, onLogin }) {
             </div>
           </div>
 
-          <button type="submit" className="submit-btn">
-            会員登録
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? '処理中...' : '会員登録'}
           </button>
         </form>
 

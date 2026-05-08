@@ -350,6 +350,43 @@ export const api = {
     }
   },
 
+  // ログイン
+  async login(email, password) {
+    if (USE_MOCK) {
+      await delay(300);
+      if (email === 'test@example.com' && password === 'password') {
+        return { success: true, data: { id: 1, email, name: 'テストユーザー', rank: 'general', points: 500, total_purchase: 0 } };
+      }
+      return { success: false, error: 'メールアドレスまたはパスワードが正しくありません' };
+    }
+
+    try {
+      const queryParams = new URLSearchParams({ path: 'members', method: 'GET', email, password });
+      const response = await fetch(`${GAS_API_URL}?${queryParams}`);
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  // 会員登録
+  async register(userData) {
+    if (USE_MOCK) {
+      await delay(300);
+      return { success: true, data: { id: Date.now(), email: userData.email, name: userData.name, rank: 'general', points: 100, status: 'active', total_purchase: 0 } };
+    }
+
+    try {
+      const response = await fetch(`${GAS_API_URL}?path=members&method=POST`, {
+        method: 'POST',
+        body: JSON.stringify(userData)
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
   // クーポン検証
   async validateCoupon(code) {
     if (USE_MOCK) {

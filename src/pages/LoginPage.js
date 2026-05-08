@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
+import { api } from '../services/api';
 import './LoginPage.css';
 
 function LoginPage({ onLogin, onRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    // 簡易的なログイン処理(デモ用)
-    if (email === 'test@example.com' && password === 'password') {
-      onLogin({
-        id: 1,
-        email: 'test@example.com',
-        name: 'テストユーザー',
-        rank: 'general',
-        points: 500
-      });
+    const result = await api.login(email, password);
+
+    setLoading(false);
+    if (result.success) {
+      onLogin(result.data);
     } else {
-      setError('メールアドレスまたはパスワードが正しくありません');
+      setError(result.error || 'ログインに失敗しました');
     }
   };
 
@@ -63,8 +62,8 @@ function LoginPage({ onLogin, onRegister }) {
             />
           </div>
 
-          <button type="submit" className="submit-btn">
-            ログイン
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? '処理中...' : 'ログイン'}
           </button>
         </form>
 
