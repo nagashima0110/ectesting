@@ -18,6 +18,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [pendingProductIds, setPendingProductIds] = useState(new Set());
 
   // ログイン状態をローカルストレージから復元
   useEffect(() => {
@@ -94,6 +95,8 @@ function App() {
           : item
       ));
     } else {
+      // 新規アイテムはGAS応答まで操作を無効化
+      setPendingProductIds(prev => new Set([...prev, productId]));
       setCart(prev => [...prev, {
         id: tempId,
         member_id: MEMBER_ID,
@@ -105,6 +108,7 @@ function App() {
 
     // バックグラウンドでAPI呼び出し
     const result = await api.addToCart(MEMBER_ID, productId, quantity);
+    setPendingProductIds(prev => { const s = new Set(prev); s.delete(productId); return s; });
     if (!result.success) {
       alert('エラー: ' + result.error);
       loadCart();
@@ -273,6 +277,7 @@ function App() {
             onUpdateCart={handleUpdateCart}
             onRemoveFromCart={handleRemoveFromCart}
             onCheckout={() => setCurrentPage('checkout')}
+            pendingProductIds={pendingProductIds}
           />
         )}
         {currentPage === 'checkout' && (

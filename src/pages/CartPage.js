@@ -17,8 +17,7 @@ function ProductImage({ name }) {
   );
 }
 
-function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
-  // カートが空の場合は早期リターン
+function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout, pendingProductIds = new Set() }) {
   if (!cart || cart.length === 0) {
     return (
       <div className="cart-page">
@@ -31,8 +30,7 @@ function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
     );
   }
 
-  // カート計算
-  const subtotal = cart.reduce((sum, item) => 
+  const subtotal = cart.reduce((sum, item) =>
     sum + (item.product.price * item.quantity), 0
   );
   const shippingFee = subtotal >= 5000 ? 0 : 500;
@@ -43,96 +41,95 @@ function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
       <h2 className="page-title">ショッピングカート</h2>
 
       <div className="cart-layout">
-        {/* カート内容 */}
         <div className="cart-items">
-          {cart.map(item => (
-            <div key={item.id} className="cart-item fade-in">
-              <div className="cart-item-image">
-                <ProductImage name={item.product.name} />
-              </div>
-              
-              <div className="cart-item-info">
-                <h3 className="cart-item-name">{item.product.name}</h3>
-                <p className="cart-item-category">{item.product.category}</p>
-                <p className="cart-item-price">
-                  ¥{item.product.price.toLocaleString()}
-                </p>
-              </div>
+          {cart.map(item => {
+            const isPending = pendingProductIds.has(item.product_id);
+            return (
+              <div key={item.id} className="cart-item">
+                <div className="cart-item-image">
+                  <ProductImage name={item.product.name} />
+                </div>
 
-              <div className="cart-item-actions">
-                <div className="quantity-control">
+                <div className="cart-item-info">
+                  <h3 className="cart-item-name">{item.product.name}</h3>
+                  <p className="cart-item-category">{item.product.category}</p>
+                  <p className="cart-item-price">
+                    ¥{item.product.price.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="cart-item-actions">
+                  <div className="quantity-control">
+                    <button
+                      onClick={() => onUpdateCart(item.id, Math.max(1, item.quantity - 1))}
+                      className="quantity-btn"
+                      disabled={item.quantity <= 1 || isPending}
+                    >
+                      <Minus size={16} />
+                    </button>
+                    <span className="quantity-display">{item.quantity}</span>
+                    <button
+                      onClick={() => onUpdateCart(item.id, item.quantity + 1)}
+                      disabled={item.quantity >= item.product.stock || isPending}
+                      className="quantity-btn"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+
+                  <div className="cart-item-subtotal">
+                    ¥{(item.product.price * item.quantity).toLocaleString()}
+                  </div>
+
                   <button
-                    onClick={() => onUpdateCart(item.id, Math.max(1, item.quantity - 1))}
-                    className="quantity-btn"
-                    disabled={item.quantity <= 1}
+                    onClick={() => onRemoveFromCart(item.id)}
+                    className="remove-btn"
+                    title="削除"
+                    disabled={isPending}
                   >
-                    <Minus size={16} />
-                  </button>
-                  <span className="quantity-display">{item.quantity}</span>
-                  <button
-                    onClick={() => onUpdateCart(item.id, item.quantity + 1)}
-                    disabled={item.quantity >= item.product.stock}
-                    className="quantity-btn"
-                  >
-                    <Plus size={16} />
+                    <Trash2 size={20} />
                   </button>
                 </div>
-                
-                <div className="cart-item-subtotal">
-                  ¥{(item.product.price * item.quantity).toLocaleString()}
-                </div>
-                
-                <button
-                  onClick={() => onRemoveFromCart(item.id)}
-                  className="remove-btn"
-                  title="削除"
-                >
-                  <Trash2 size={20} />
-                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* 注文サマリー */}
-        <div className="order-summary-container">
-          <div className="order-summary">
+        <div className="cart-order-summary-container">
+          <div className="cart-summary-panel">
             <h3 className="summary-title">注文サマリー</h3>
-            
+
             <div className="summary-details">
-              <div className="summary-row">
+              <div className="cart-summary-row">
                 <span>小計</span>
                 <span>¥{subtotal.toLocaleString()}</span>
               </div>
-              
-              <div className="summary-row">
+
+              <div className="cart-summary-row">
                 <span>送料</span>
                 <span className={shippingFee === 0 ? 'free-shipping' : ''}>
-                  {shippingFee === 0 ? '無料' : `¥${shippingFee}`}
+                  {shippingFee === 0 ? '無料' : `¥${shippingFee.toLocaleString()}`}
                 </span>
               </div>
-              
+
               {subtotal < 5000 && (
                 <div className="shipping-notice">
                   あと¥{(5000 - subtotal).toLocaleString()}で送料無料
                 </div>
               )}
-              
+
               <div className="summary-divider"></div>
-              
-              <div className="summary-row total-row">
+
+              <div className="cart-summary-row cart-total-row">
                 <span>合計</span>
-                <span className="total-amount">¥{total.toLocaleString()}</span>
+                <span className="cart-total-amount">¥{total.toLocaleString()}</span>
               </div>
             </div>
 
-            <button
-              onClick={onCheckout}
-              className="checkout-btn"
-            >
+            <button onClick={onCheckout} className="checkout-btn">
               レジに進む
             </button>
-            
+
             <div className="security-notice">
               <span>🔒</span>
               安全な決済
