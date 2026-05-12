@@ -16,7 +16,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ category: '', search: '' });
   const [currentUser, setCurrentUser] = useState(null);
-  
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
   // ログイン状態をローカルストレージから復元
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
@@ -53,6 +55,15 @@ function App() {
     if (result.success) {
       setCart(result.data);
     }
+  };
+
+  const loadOrders = async () => {
+    setOrdersLoading(true);
+    const result = await api.getOrders(MEMBER_ID);
+    if (result.success) {
+      setOrders(result.data);
+    }
+    setOrdersLoading(false);
   };
 
   useEffect(() => {
@@ -208,7 +219,7 @@ function App() {
                   )}
                 </button>
                 <button
-                  onClick={() => setCurrentPage('orders')}
+                  onClick={() => { loadOrders(); setCurrentPage('orders'); }}
                   className={`nav-button ${currentPage === 'orders' ? 'active' : ''}`}
                 >
                   <Package size={20} />
@@ -271,6 +282,7 @@ function App() {
             currentUser={currentUser}
             onSuccess={(usedPoints) => {
               loadCart();
+              loadOrders();
               
               // ポイント更新と会員情報の再読み込み
               if (currentUser) {
@@ -316,7 +328,12 @@ function App() {
           />
         )}
         {currentPage === 'orders' && (
-          <OrderHistoryPage memberId={MEMBER_ID} />
+          <OrderHistoryPage
+            memberId={MEMBER_ID}
+            orders={orders}
+            loading={ordersLoading}
+            onReload={loadOrders}
+          />
         )}
         {currentPage === 'login' && (
           <LoginPage onLogin={handleLogin} onRegister={() => setCurrentPage('register')} />

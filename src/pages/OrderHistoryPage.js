@@ -1,25 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Package, ChevronDown, ChevronUp } from 'lucide-react';
 import { api } from '../services/api';
 import './OrderHistoryPage.css';
 
-function OrderHistoryPage({ memberId }) {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+function OrderHistoryPage({ memberId, orders, loading, onReload }) {
   const [expandedOrders, setExpandedOrders] = useState(new Set());
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const loadOrders = async () => {
-    setLoading(true);
-    const result = await api.getOrders(memberId);
-    if (result.success) {
-      setOrders(result.data);
-    }
-    setLoading(false);
-  };
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
 
   const toggleOrderExpand = (orderId) => {
     const newExpanded = new Set(expandedOrders);
@@ -47,7 +36,7 @@ function OrderHistoryPage({ memberId }) {
     
     if (result.success) {
       alert(result.message || '注文をキャンセルしました');
-      loadOrders();
+      onReload();
     } else {
       alert('エラー: ' + result.error);
     }
@@ -93,7 +82,7 @@ function OrderHistoryPage({ memberId }) {
       <h2 className="page-title">注文履歴</h2>
 
       <div className="orders-list">
-        {orders.map(order => {
+        {sortedOrders.map(order => {
           const status = statusLabels[order.status] || { label: order.status, color: 'gray' };
           const isExpanded = expandedOrders.has(order.id);
           const finalAmount = order.total_amount - order.discount_amount + order.shipping_fee;
