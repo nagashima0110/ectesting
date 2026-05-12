@@ -1,6 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, Package, Minus, Plus, Trash2 } from 'lucide-react';
 import './CartPage.css';
+
+function ProductImage({ name }) {
+  const [error, setError] = useState(false);
+  if (error) {
+    return <Package size={40} className="cart-item-icon" />;
+  }
+  return (
+    <img
+      src={`${process.env.PUBLIC_URL}/images/${name}.jpg`}
+      alt={name}
+      className="cart-item-img"
+      onError={() => setError(true)}
+    />
+  );
+}
 
 function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
   // カートが空の場合は早期リターン
@@ -33,7 +48,7 @@ function CartPage({ cart, onUpdateCart, onRemoveFromCart, onCheckout }) {
           {cart.map(item => (
             <div key={item.id} className="cart-item fade-in">
               <div className="cart-item-image">
-                <Package size={40} className="cart-item-icon" />
+                <ProductImage name={item.product.name} />
               </div>
               
               <div className="cart-item-info">
