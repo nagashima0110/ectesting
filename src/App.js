@@ -74,28 +74,34 @@ function App() {
 
     // 即座にUI更新
     const existingItem = cart.find(item => item.product_id === productId);
+    const tempId = Date.now(); // 新規アイテム用の一時ID
+
     if (existingItem) {
-      setCart(cart.map(item => 
-        item.product_id === productId 
+      setCart(cart.map(item =>
+        item.product_id === productId
           ? { ...item, quantity: item.quantity + quantity }
           : item
       ));
     } else {
-      const newItem = {
-        id: Date.now(),
+      setCart(prev => [...prev, {
+        id: tempId,
         member_id: MEMBER_ID,
         product_id: productId,
         quantity,
         product
-      };
-      setCart([...cart, newItem]);
+      }]);
     }
 
     // バックグラウンドでAPI呼び出し
     const result = await api.addToCart(MEMBER_ID, productId, quantity);
     if (!result.success) {
       alert('エラー: ' + result.error);
-      loadCart(); // エラー時は再読み込み
+      loadCart();
+    } else if (!existingItem && result.data?.id) {
+      // 新規追加時: GASが発行したIDで一時IDを置き換える
+      setCart(prev => prev.map(item =>
+        item.id === tempId ? { ...item, id: result.data.id } : item
+      ));
     }
   };
 
