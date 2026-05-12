@@ -3,7 +3,7 @@
 // ========================================
 
 // TODO: 実際のGAS URLに置き換えてください
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzdFrfCvlOqV3-9WWrlgRAtYRjqlLnv24tN0zF5JgAJ9sMOJqVbnxadLIQCUA7ewVSjvw/exec';
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycby7RSW-gHr-bkOTwrQScoy4ILWRUKkNVKZqMo0z2Ef4TEQ4-WkB5Xn2TXRCAn4vBlDtNQ/exec';
 
 // 開発用: GAS URLが未設定の場合はモックデータを返す
 const USE_MOCK = GAS_API_URL === 'YOUR_GAS_DEPLOYMENT_URL_HERE';
@@ -146,10 +146,14 @@ export const api = {
     }
 
     try {
-      const response = await fetch(`${GAS_API_URL}?path=cart&method=POST`, {
+      const queryParams = new URLSearchParams({
+        path: 'cart',
         method: 'POST',
-        body: JSON.stringify({ member_id: memberId, product_id: productId, quantity })
+        member_id: memberId,
+        product_id: productId,
+        quantity
       });
+      const response = await fetch(`${GAS_API_URL}?${queryParams}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };
@@ -175,10 +179,8 @@ export const api = {
     }
 
     try {
-      const response = await fetch(`${GAS_API_URL}?path=cart&method=PUT`, {
-        method: 'POST',
-        body: JSON.stringify({ id, quantity })
-      });
+      const queryParams = new URLSearchParams({ path: 'cart', method: 'PUT', id, quantity });
+      const response = await fetch(`${GAS_API_URL}?${queryParams}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };
@@ -198,10 +200,7 @@ export const api = {
     }
 
     try {
-      const response = await fetch(
-        `${GAS_API_URL}?path=cart&method=DELETE&id=${id}`,
-        { method: 'POST' }
-      );
+      const response = await fetch(`${GAS_API_URL}?path=cart&method=DELETE&id=${id}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };
@@ -277,10 +276,17 @@ export const api = {
     }
 
     try {
-      const response = await fetch(`${GAS_API_URL}?path=orders&method=POST`, {
+      const queryParams = new URLSearchParams({
+        path: 'orders',
         method: 'POST',
-        body: JSON.stringify(orderData)
+        member_id: orderData.member_id,
+        payment_method: orderData.payment_method,
+        shipping_method: orderData.shipping_method || 'standard',
+        coupon_code: orderData.coupon_code || '',
+        use_points: orderData.use_points || 0,
+        shipping_address: orderData.shipping_address || ''
       });
+      const response = await fetch(`${GAS_API_URL}?${queryParams}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };
@@ -340,10 +346,13 @@ export const api = {
     }
 
     try {
-      const response = await fetch(`${GAS_API_URL}?path=cancel-order&method=POST`, {
+      const queryParams = new URLSearchParams({
+        path: 'cancel-order',
         method: 'POST',
-        body: JSON.stringify({ order_id: orderId, member_id: memberId })
+        order_id: orderId,
+        member_id: memberId
       });
+      const response = await fetch(`${GAS_API_URL}?${queryParams}`);
       return await response.json();
     } catch (error) {
       return { success: false, error: error.message };
