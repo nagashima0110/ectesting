@@ -498,6 +498,8 @@ function createOrder(body) {
     }
   }
 
+  updateMemberRank(memberId, totalAmount);
+
   return {
     success: true,
     data: {

@@ -131,6 +131,28 @@
   font-weight: 600;
 }
 
+.user-rank {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.user-rank--general {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.user-rank--gold {
+  background: #fbbf24;
+  color: #78350f;
+}
+
+.user-rank--platinum {
+  background: #e2e8f0;
+  color: #334155;
+}
+
 .user-points {
   background: #fbbf24;
   color: #92400e;

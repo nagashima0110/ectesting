@@ -244,6 +244,9 @@ function App() {
                 </button>
                 <div className="user-info">
                   <span className="user-name">{currentUser.name}</span>
+                  <span className={`user-rank user-rank--${currentUser.rank || 'general'}`}>
+                    {{ general: '一般会員', gold: 'ゴールド会員', platinum: 'プラチナ会員' }[currentUser.rank || 'general']}
+                  </span>
                   <span className="user-points">{currentUser.points || 0}pt</span>
                   <button onClick={handleLogout} className="logout-btn">
                     ログアウト
