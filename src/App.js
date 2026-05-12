@@ -276,7 +276,7 @@ function App() {
             cart={cart}
             onUpdateCart={handleUpdateCart}
             onRemoveFromCart={handleRemoveFromCart}
-            onCheckout={() => setCurrentPage('checkout')}
+            onCheckout={() => { loadOrders(); setCurrentPage('checkout'); }}
             pendingProductIds={pendingProductIds}
           />
         )}
