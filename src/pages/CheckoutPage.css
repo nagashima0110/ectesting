@@ -391,6 +391,11 @@
   color: #059669;
 }
 
+.summary-row.earned-points {
+  color: #d97706;
+  font-size: 0.875rem;
+}
+
 .summary-row.total {
   font-size: 1.125rem;
   font-weight: 700;

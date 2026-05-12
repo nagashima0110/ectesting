@@ -443,7 +443,9 @@ function createOrder(body) {
   const usePoints = Number(body.use_points) || 0;
   discountAmount += usePoints;
 
-  const shippingFee = totalAmount >= 5000 ? 0 : 500;
+  const shippingOptionFees = { standard: 0, express: 500, scheduled: 300 };
+  const shippingOptionFee = shippingOptionFees[body.shipping_method || 'standard'] || 0;
+  const shippingFee = (totalAmount >= 5000 ? 0 : 500) + shippingOptionFee;
   const orderId = new Date().getTime();
 
   appendRow('orders', [
@@ -457,7 +459,8 @@ function createOrder(body) {
     body.shipping_method || 'standard',
     body.shipping_address || '',
     new Date().toISOString(),
-    new Date().toISOString()
+    new Date().toISOString(),
+    usePoints
   ]);
 
   for (let i = 0; i < cartItems.length; i++) {
@@ -589,7 +592,8 @@ function cancelOrder(body) {
       order = {
         id: orderData[i][0],
         member_id: orderData[i][1],
-        status: orderData[i][2]
+        status: orderData[i][2],
+        use_points: Number(orderData[i][11]) || 0
       };
       break;
     }
@@ -600,6 +604,7 @@ function cancelOrder(body) {
   }
 
   const cancellableStatuses = ['pending', 'paid', 'preparing'];
+
   if (!cancellableStatuses.includes(order.status)) {
     return {
       success: false,
@@ -634,9 +639,22 @@ function cancelOrder(body) {
       }
     }
 
+    if (order.use_points > 0) {
+      const memberSheet = getSheet('members');
+      const memberData = memberSheet.getDataRange().getValues();
+      for (let i = 1; i < memberData.length; i++) {
+        if (String(memberData[i][0]) === String(memberId)) {
+          const currentPoints = Number(memberData[i][7]) || 0;
+          memberSheet.getRange(i + 1, 8).setValue(currentPoints + order.use_points);
+          break;
+        }
+      }
+    }
+
     return {
       success: true,
-      message: '注文をキャンセルしました。在庫とポイントを返却しました。'
+      message: '注文をキャンセルしました。在庫とポイントを返却しました。',
+      refund_points: order.use_points
     };
 
   } catch (error) {
@@ -810,7 +828,7 @@ function initializeData() {
 
     const ordersSheet = getSheet('orders');
     ordersSheet.clear();
-    ordersSheet.appendRow(['id', 'member_id', 'status', 'total_amount', 'discount_amount', 'shipping_fee', 'payment_method', 'shipping_method', 'shipping_address', 'created_at', 'updated_at']);
+    ordersSheet.appendRow(['id', 'member_id', 'status', 'total_amount', 'discount_amount', 'shipping_fee', 'payment_method', 'shipping_method', 'shipping_address', 'created_at', 'updated_at', 'use_points']);
 
     const orderItemsSheet = getSheet('order_items');
     orderItemsSheet.clear();

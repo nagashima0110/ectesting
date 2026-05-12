@@ -35,7 +35,10 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
     }
   }
   
-  const shippingFee = subtotal >= 5000 ? 0 : 500;
+  const shippingOptionFees = { standard: 0, express: 500, scheduled: 300 };
+  const shippingFee = (subtotal >= 5000 ? 0 : 500) + shippingOptionFees[shippingMethod];
+  const productPayment = Math.max(0, subtotal - discount);
+  const earnedPoints = Math.floor(productPayment * 0.1);
   const total = subtotal - discount + shippingFee;
 
   const handleValidateCoupon = async () => {
@@ -78,7 +81,7 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
 
     if (result.success) {
       alert('注文が完了しました!');
-      onSuccess(actualUsePoints); // 使用ポイントを渡す
+      onSuccess({ usedPoints: actualUsePoints, earnedPoints });
     } else {
       alert('エラー: ' + result.error);
     }
@@ -297,7 +300,12 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
               
               <div className="summary-row">
                 <span>送料</span>
-                <span>¥{shippingFee}</span>
+                <span>¥{shippingFee.toLocaleString()}</span>
+              </div>
+
+              <div className="summary-row earned-points">
+                <span>購入ポイント付与</span>
+                <span>+{earnedPoints.toLocaleString()}pt</span>
               </div>
               
               <div className="confirmation-divider"></div>

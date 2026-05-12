@@ -301,37 +301,33 @@ function App() {
             cart={cart}
             memberId={MEMBER_ID}
             currentUser={currentUser}
-            onSuccess={(usedPoints) => {
+            onSuccess={({ usedPoints, earnedPoints }) => {
               loadCart();
               loadOrders();
-              
-              // ポイント更新と会員情報の再読み込み
+
               if (currentUser) {
-                // ランクアップの可能性があるため、最新の会員情報を取得
-                // 簡易実装: ローカルで計算
                 const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
                 const currentTotalPurchase = currentUser.total_purchase || 0;
                 const newTotalPurchase = currentTotalPurchase + orderTotal;
-                
+
                 let newRank = 'general';
                 if (newTotalPurchase >= 100000) {
                   newRank = 'platinum';
                 } else if (newTotalPurchase >= 50000) {
                   newRank = 'gold';
                 }
-                
-                const newPoints = (currentUser.points || 0) - (usedPoints || 0) + 100;
-                const updatedUser = { 
-                  ...currentUser, 
+
+                const newPoints = (currentUser.points || 0) - usedPoints + earnedPoints;
+                const updatedUser = {
+                  ...currentUser,
                   points: newPoints,
                   rank: newRank,
                   total_purchase: newTotalPurchase
                 };
-                
+
                 setCurrentUser(updatedUser);
                 localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-                
-                // ランクアップした場合は通知
+
                 if (newRank !== currentUser.rank) {
                   const rankNames = {
                     'general': '一般会員',
@@ -343,7 +339,7 @@ function App() {
                   }, 500);
                 }
               }
-              
+
               setCurrentPage('orders');
             }}
           />
@@ -354,6 +350,13 @@ function App() {
             orders={orders}
             loading={ordersLoading}
             onReload={loadOrders}
+            onCancelSuccess={(refundPoints) => {
+              if (currentUser && refundPoints > 0) {
+                const updatedUser = { ...currentUser, points: (currentUser.points || 0) + refundPoints };
+                setCurrentUser(updatedUser);
+                localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+              }
+            }}
           />
         )}
         {currentPage === 'login' && (

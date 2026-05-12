@@ -3,7 +3,7 @@ import { Package, ChevronDown, ChevronUp } from 'lucide-react';
 import { api } from '../services/api';
 import './OrderHistoryPage.css';
 
-function OrderHistoryPage({ memberId, orders, loading, onReload }) {
+function OrderHistoryPage({ memberId, orders, loading, onReload, onCancelSuccess }) {
   const [expandedOrders, setExpandedOrders] = useState(new Set());
 
   const sortedOrders = [...orders].sort(
@@ -36,6 +36,9 @@ function OrderHistoryPage({ memberId, orders, loading, onReload }) {
     
     if (result.success) {
       alert(result.message || '注文をキャンセルしました');
+      if (onCancelSuccess && result.refund_points > 0) {
+        onCancelSuccess(result.refund_points);
+      }
       onReload();
     } else {
       alert('エラー: ' + result.error);
