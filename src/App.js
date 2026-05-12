@@ -58,11 +58,22 @@ function App() {
     }
   };
 
+  const ORDERS_CACHE_KEY = `ordersCache_${MEMBER_ID}`;
+
   const loadOrders = async () => {
-    setOrdersLoading(true);
+    // キャッシュがあれば即座に表示してからバックグラウンドで更新
+    const cached = localStorage.getItem(ORDERS_CACHE_KEY);
+    if (cached) {
+      setOrders(JSON.parse(cached));
+      setOrdersLoading(false);
+    } else {
+      setOrdersLoading(true);
+    }
+
     const result = await api.getOrders(MEMBER_ID);
     if (result.success) {
       setOrders(result.data);
+      localStorage.setItem(ORDERS_CACHE_KEY, JSON.stringify(result.data));
     }
     setOrdersLoading(false);
   };
@@ -159,7 +170,9 @@ function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem(ORDERS_CACHE_KEY);
     setCart([]);
+    setOrders([]);
     setCurrentPage('products');
   };
 
