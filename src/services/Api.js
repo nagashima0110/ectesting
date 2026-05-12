@@ -3,7 +3,7 @@
 // ========================================
 
 // TODO: 実際のGAS URLに置き換えてください
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycby08M51fsRaWDWYVf-n0er10nJGQTk-vmZCCH92G7F7ak-h57XWFxljB0lk2jmm0JeUxQ/exec';
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwZk82S3o-aHV5YxHNhfDrW6wKd1U8j6DDVUpGEKGcb9HHVA340AtN-hFQHXgen-4DkgA/exec';
 
 // 開発用: GAS URLが未設定の場合はモックデータを返す
 const USE_MOCK = GAS_API_URL === 'YOUR_GAS_DEPLOYMENT_URL_HERE';
@@ -225,8 +225,9 @@ export const api = {
         totalAmount += product.price * item.quantity;
       }
 
-      const discountAmount = 0; // 簡略化のため割引なし
-      const shippingFee = totalAmount >= 5000 ? 0 : 500;
+      const discountAmount = orderData.use_points || 0;
+      const shippingOptionFees = { standard: 0, express: 500, scheduled: 300 };
+      const shippingFee = (totalAmount >= 5000 ? 0 : 500) + (shippingOptionFees[orderData.shipping_method || 'standard'] || 0);
 
       const orderId = Date.now();
       const order = {
@@ -236,6 +237,7 @@ export const api = {
         total_amount: totalAmount,
         discount_amount: discountAmount,
         shipping_fee: shippingFee,
+        use_points: orderData.use_points || 0,
         payment_method: orderData.payment_method,
         shipping_method: orderData.shipping_method || 'standard',
         shipping_address: orderData.shipping_address || '',
@@ -330,8 +332,7 @@ export const api = {
       }
       
       order.status = 'cancelled';
-      
-      // 在庫を戻す
+
       order.items.forEach(item => {
         const product = mockProducts.find(p => p.id === item.product_id);
         if (product) {
@@ -341,8 +342,12 @@ export const api = {
           }
         }
       });
-      
-      return { success: true, message: '注文をキャンセルしました' };
+
+      return {
+        success: true,
+        message: '注文をキャンセルしました。在庫とポイントを返却しました。',
+        refund_points: order.use_points || 0
+      };
     }
 
     try {
