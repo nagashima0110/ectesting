@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CreditCard, Truck, Tag, CheckCircle } from 'lucide-react';
 import { api } from '../services/api';
 import './CheckoutPage.css';
@@ -10,31 +10,51 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
   const [couponValid, setCouponValid] = useState(null);
   const [usePoints, setUsePoints] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const prefetchRef = useRef({ code: '', result: null });
 
-  const subtotal = cart.reduce((sum, item) => 
+  // クーポンコード入力から600ms後にバックグラウンドで先読み
+  useEffect(() => {
+    if (couponCode.length < 4) {
+      prefetchRef.current = { code: '', result: null };
+      return;
+    }
+    const timer = setTimeout(async () => {
+      const result = await api.validateCoupon(couponCode);
+      prefetchRef.current = { code: couponCode, result };
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [couponCode]);
+
+  const subtotal = cart.reduce((sum, item) =>
     sum + (item.product.price * item.quantity), 0
   );
-  
+
   // ポイント利用の上限(購入金額の50%まで)
   const maxPoints = Math.min(
     currentUser?.points || 0,
     Math.floor(subtotal * 0.5)
   );
-  
+
   // 実際に使用するポイント
   const actualUsePoints = Math.min(usePoints, maxPoints);
-  
-  let discount = actualUsePoints; // ポイント割引
-  
+
+  // ランク割引
+  const rankDiscountRates = { general: 0, gold: 0.05, platinum: 0.10 };
+  const rankRate = rankDiscountRates[currentUser?.rank || 'general'] || 0;
+  const rankDiscount = Math.floor(subtotal * rankRate);
+
+  // クーポン割引
+  let couponDiscount = 0;
   if (couponValid?.valid) {
     const coupon = couponValid.coupon;
     if (coupon.discount_type === 'percentage') {
-      discount += subtotal * (coupon.discount_value / 100);
+      couponDiscount = Math.floor(subtotal * (coupon.discount_value / 100));
     } else {
-      discount += coupon.discount_value;
+      couponDiscount = Number(coupon.discount_value);
     }
   }
-  
+
+  const discount = actualUsePoints + rankDiscount + couponDiscount;
   const shippingOptionFees = { standard: 0, express: 500, scheduled: 300 };
   const shippingFee = (subtotal >= 5000 ? 0 : 500) + shippingOptionFees[shippingMethod];
   const productPayment = Math.max(0, subtotal - discount);
@@ -46,15 +66,27 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
       alert('クーポンコードを入力してください');
       return;
     }
-    
-    const result = await api.validateCoupon(couponCode);
-    if (result.success) {
-      setCouponValid(result.data);
-      if (result.data.valid) {
-        alert('クーポンが適用されました!');
-      } else {
-        alert(result.data.message);
+
+    const cached = prefetchRef.current;
+    const result = cached.code === couponCode && cached.result
+      ? cached.result
+      : await api.validateCoupon(couponCode);
+    if (!result.success) return;
+
+    if (result.data.valid) {
+      const coupon = result.data.coupon;
+      const minPurchase = Number(coupon.min_purchase) || 0;
+      if (minPurchase > 0 && subtotal < minPurchase) {
+        const errData = { valid: false, message: `最低購入金額に達していません（¥${minPurchase.toLocaleString()}以上）` };
+        setCouponValid(errData);
+        alert(errData.message);
+        return;
       }
+      setCouponValid(result.data);
+      alert('クーポンが適用されました!');
+    } else {
+      setCouponValid(result.data);
+      alert(result.data.message);
     }
   };
 
@@ -182,11 +214,12 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
               <input
                 type="number"
                 value={usePoints}
-                onChange={(e) => setUsePoints(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setUsePoints(Math.max(0, Math.floor(Number(e.target.value))))}
                 placeholder="利用ポイント"
                 className="points-input"
                 min="0"
                 max={maxPoints}
+                step="1"
               />
               <span className="points-unit">pt</span>
               <button
@@ -290,11 +323,18 @@ function CheckoutPage({ cart, memberId, currentUser, onSuccess }) {
                   <span>-¥{actualUsePoints.toLocaleString()}</span>
                 </div>
               )}
-              
-              {discount > actualUsePoints && (
+
+              {rankDiscount > 0 && (
+                <div className="summary-row discount">
+                  <span>ランク割引（{currentUser?.rank === 'gold' ? 'ゴールド' : 'プラチナ'}会員 {rankRate * 100}%OFF）</span>
+                  <span>-¥{rankDiscount.toLocaleString()}</span>
+                </div>
+              )}
+
+              {couponDiscount > 0 && (
                 <div className="summary-row discount">
                   <span>クーポン割引</span>
-                  <span>-¥{(discount - actualUsePoints).toLocaleString()}</span>
+                  <span>-¥{couponDiscount.toLocaleString()}</span>
                 </div>
               )}
               
