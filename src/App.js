@@ -39,10 +39,7 @@ function App() {
 
   const loadProducts = async () => {
     setLoading(true);
-    const params = {};
-    if (filters.category) params.category = filters.category;
-    
-    const result = await api.getProducts(params);
+    const result = await api.getProducts();
     if (result.success) {
       setProducts(result.data);
     } else {
@@ -78,9 +75,6 @@ function App() {
     setOrdersLoading(false);
   };
 
-  useEffect(() => {
-    loadProducts();
-  }, [filters.category]);
 
   // 楽観的UI更新: カート追加
   const handleAddToCart = async (productId, quantity = 1) => {
@@ -284,7 +278,7 @@ function App() {
             filters={filters}
             setFilters={setFilters}
             onAddToCart={handleAddToCart}
-            isLoggedIn={!!currentUser}
+            currentUser={currentUser}
           />
         )}
         {currentPage === 'cart' && (

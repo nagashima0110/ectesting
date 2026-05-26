@@ -19,9 +19,25 @@ function ProductImage({ name }) {
   );
 }
 
-function ProductListPage({ products, loading, filters, setFilters, onAddToCart, isLoggedIn }) {
-  const filteredProducts = products.filter(p => 
-    !filters.search || p.name.toLowerCase().includes(filters.search.toLowerCase())
+function calculateAge(birthDateStr) {
+  if (!birthDateStr) return null;
+  const today = new Date();
+  const birth = new Date(birthDateStr);
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+
+function ProductListPage({ products, loading, filters, setFilters, onAddToCart, currentUser }) {
+  const isLoggedIn = !!currentUser;
+  const userAge = calculateAge(currentUser?.birth_date);
+
+  const categories = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
+
+  const filteredProducts = products.filter(p =>
+    (!filters.category || p.category === filters.category) &&
+    (!filters.search || p.name.toLowerCase().includes(filters.search.toLowerCase()))
   );
 
   return (
@@ -39,9 +55,9 @@ function ProductListPage({ products, loading, filters, setFilters, onAddToCart, 
               className="filter-select"
             >
               <option value="">すべて</option>
-              <option value="書籍">書籍</option>
-              <option value="電子機器">電子機器</option>
-              <option value="雑貨">雑貨</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
           
@@ -87,8 +103,13 @@ function ProductListPage({ products, loading, filters, setFilters, onAddToCart, 
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
                 <p className="product-category">{product.category}</p>
+                {product.age_restriction > 0 && (
+                  <span className="age-restriction-badge">
+                    {product.age_restriction}歳以上
+                  </span>
+                )}
                 <p className="product-description">{product.description}</p>
-                
+
                 <div className="product-footer">
                   <div className="product-price-section">
                     <span className="product-price">
@@ -105,13 +126,30 @@ function ProductListPage({ products, loading, filters, setFilters, onAddToCart, 
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => onAddToCart(product.id)}
-                    disabled={product.stock === 0}
-                    className={`add-to-cart-btn ${product.stock === 0 ? 'disabled' : ''}`}
-                  >
-                    {product.stock === 0 ? '在庫切れ' : 'カートに追加'}
-                  </button>
+                  {(() => {
+                    if (product.stock === 0) {
+                      return <button disabled className="add-to-cart-btn disabled">在庫切れ</button>;
+                    }
+                    if (!isLoggedIn) {
+                      return <button disabled className="add-to-cart-btn disabled">ログインしてください</button>;
+                    }
+                    if (product.age_restriction > 0) {
+                      if (!currentUser.birth_date) {
+                        return <button disabled className="add-to-cart-btn disabled" title="生年月日を登録してください">生年月日未登録</button>;
+                      }
+                      if (userAge < product.age_restriction) {
+                        return <button disabled className="add-to-cart-btn disabled">{product.age_restriction}歳未満は購入不可</button>;
+                      }
+                    }
+                    return (
+                      <button
+                        onClick={() => onAddToCart(product.id)}
+                        className="add-to-cart-btn"
+                      >
+                        カートに追加
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
